@@ -1,7 +1,7 @@
 
 import React, { createContext, useState, useContext, useEffect, useCallback, ReactNode } from 'react';
 import { Client, Appointment, MedicalResultStatus, PaymentStatus, BookingStatus } from '../types';
-import { generateMockClients } from '../services/geminiService';
+import { getClients } from '../services/localDataService';
 import { v4 as uuidv4 } from 'uuid';
 import { useNotifications } from './NotificationContext';
 
@@ -25,36 +25,6 @@ export const useClients = () => {
   return context;
 };
 
-// Hardcoded client for demo login
-const demoClient: Client = {
-    id: "c7a4c5a3-4a7c-4c4c-8a0a-4a2c7c7d7e3a",
-    firstName: "Farhan",
-    lastName: "Ahmed",
-    passportNumber: "K8765432",
-    nationality: "Pakistani",
-    dateOfBirth: "1990-05-15",
-    contactNumber: "+923001234567",
-    email: "client@example.com",
-    profilePicture: "https://picsum.photos/id/433/200/200",
-    appointment: {
-        id: "appt-c7a4c5a3",
-        wafidApplicationId: "WFD789012",
-        appointmentDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-        appointmentTime: "11:00",
-        medicalCenterName: "Islamabad Diagnostic Centre",
-        paymentStatus: PaymentStatus.PAID,
-        bookingStatus: BookingStatus.BOOKED_CONFIRMED,
-        medicalResultStatus: MedicalResultStatus.PENDING_RESULTS,
-        bookingDate: new Date().toISOString().split('T')[0],
-        medicalSlipUrl: "#",
-        history: [
-            { status: BookingStatus.DATA_PREPARED, date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), notes: "Client application created by agent." },
-            { status: BookingStatus.BOOKED_CONFIRMED, date: new Date().toISOString(), notes: "Appointment successfully scheduled." }
-        ]
-    }
-};
-
-
 export const ClientProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -70,13 +40,12 @@ export const ClientProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         if (cachedClients) {
             setClients(JSON.parse(cachedClients));
         } else {
-            const mockClients = await generateMockClients(50);
-            if (mockClients.length === 0) {
-              setError("Failed to fetch client data from Gemini. The API might be unavailable or returned no data.");
+            const clientData = await getClients();
+            if (clientData.length === 0) {
+              setError("Failed to fetch client data from the local data source.");
             }
-            const allClients = [demoClient, ...mockClients];
-            setClients(allClients);
-            sessionStorage.setItem('mockClients', JSON.stringify(allClients));
+            setClients(clientData);
+            sessionStorage.setItem('mockClients', JSON.stringify(clientData));
         }
       } catch (err) {
         setError('An error occurred while fetching client data.');

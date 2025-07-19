@@ -1,0 +1,37 @@
+[
+  {
+    "id": "c7a4c5a3-4a7c-4c4c-8a0a-4a2c7c7d7e3a",
+    "firstName": "Farhan",
+    "lastName": "Ahmed",
+    "passportNumber": "K8765432",
+    "nationality": "Pakistani",
+    "dateOfBirth": "1990-05-15",
+    "contactNumber": "+923001234567",
+    "email": "client@example.com",
+    "profilePicture": "https://picsum.photos/id/433/200/200",
+    "appointment": {
+      "id": "appt-c7a4c5a3",
+      "wafidApplicationId": "WFD789012",
+      "appointmentDate": "2025-07-24T05:40:41.470Z",
+      "appointmentTime": "11:00",
+      "medicalCenterName": "Islamabad Diagnostic Centre",
+      "paymentStatus": "Paid",
+      "bookingStatus": "Booked & Confirmed",
+      "medicalResultStatus": "Pending Results",
+      "bookingDate": "2025-07-19",
+      "medicalSlipUrl": "#",
+      "history": [
+        {
+          "status": "Data Prepared",
+          "date": "2025-07-16T05:40:41.470Z",
+          "notes": "Client application created by agent."
+        },
+        {
+          "status": "Booked & Confirmed",
+          "date": "2025-07-19T05:40:41.470Z",
+          "notes": "Appointment successfully scheduled."
+        }
+      ]
+    }
+  }
+]
