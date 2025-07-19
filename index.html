@@ -1,0 +1,72 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Arise Enterprises CRM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Poppins', 'sans-serif'],
+            },
+            colors: {
+              background: '#f8f9fa', // Off-white, clean background
+              surface: '#ffffff', // For cards and modals
+              primary: '#073B4C', // Deep, rich teal/blue
+              accent: {
+                DEFAULT: '#D4AF37', // A rich, classic gold
+                hover: '#B89B3D'
+              },
+              secondary: '#118AB2', // A brighter, complementary blue
+              text: {
+                primary: '#0f172a', // Almost black for high contrast
+                secondary: '#64748b',
+                on_primary: '#ffffff',
+              },
+              danger: '#D32F2F',
+            }
+          }
+        }
+      }
+    </script>
+    <!-- Polyfill for ResizeObserver -->
+    <script>
+      if (typeof window.ResizeObserver === 'undefined') {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/resize-observer-polyfill@1.5.1/dist/ResizeObserver.global.js';
+        document.head.appendChild(script);
+      }
+    </script>
+    <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.2.0",
+    "react-dom": "https://esm.sh/react-dom@18.2.0",
+    "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+    "react-router-dom": "https://esm.sh/react-router-dom@^6.25.1",
+    "@google/genai": "https://esm.sh/@google/genai@^0.14.0",
+    "recharts": "https://esm.sh/recharts@^2.12.7",
+    "@react-three/drei": "https://esm.sh/@react-three/drei@^9.108.3",
+    "@react-three/fiber": "https://esm.sh/@react-three/fiber@^8.16.8",
+    "uuid": "https://esm.sh/uuid@^9.0.1",
+    "three": "https://esm.sh/three@^0.166.1",
+    "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
+    "react/": "https://esm.sh/react@^19.1.0/"
+  }
+}
+</script>
+  <link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-background">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
