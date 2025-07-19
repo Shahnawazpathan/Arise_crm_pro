@@ -9,29 +9,30 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@300;400;600&display=swap" rel="stylesheet">
     <script>
       tailwind.config = {
         theme: {
           extend: {
             fontFamily: {
-              sans: ['Poppins', 'sans-serif'],
+              sans: ['Cairo', 'sans-serif'],
+              serif: ['Amiri', 'serif'],
             },
             colors: {
-              background: '#f8f9fa', // Off-white, clean background
-              surface: '#ffffff', // For cards and modals
-              primary: '#073B4C', // Deep, rich teal/blue
+              background: '#fdf6e3', // Creamy, parchment-like background
+              surface: '#fbf1c7', // Lighter, sandy surface for cards
+              primary: '#004d40', // Deep, rich teal
               accent: {
-                DEFAULT: '#D4AF37', // A rich, classic gold
-                hover: '#B89B3D'
+                DEFAULT: '#c0a080', // Soft, elegant gold
+                hover: '#a68868'
               },
-              secondary: '#118AB2', // A brighter, complementary blue
+              secondary: '#8d6e63', // Earthy brown
               text: {
-                primary: '#0f172a', // Almost black for high contrast
-                secondary: '#64748b',
-                on_primary: '#ffffff',
+                primary: '#3c3836', // Dark, earthy brown for text
+                secondary: '#665851',
+                on_primary: '#fbf1c7',
               },
-              danger: '#D32F2F',
+              danger: '#c62828',
             }
           }
         }

@@ -22,7 +22,7 @@ const AddClientPage: React.FC = () => {
   const [profilePicture, setProfilePicture] = useState<string | undefined>(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -48,7 +48,7 @@ const AddClientPage: React.FC = () => {
         return;
     }
 
-    const clientData = { ...formData, profilePicture };
+    const clientData = { ...formData, profilePicture, location: formData.location };
     addClient(clientData as Omit<Client, 'id' | 'appointment'>);
 
     showToast('Client added successfully!', 'success');
@@ -113,6 +113,22 @@ const AddClientPage: React.FC = () => {
                   </div>
                 );
               })}
+            <div>
+              <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
+                Location
+              </label>
+              <select
+                id="location"
+                name="location"
+                onChange={(e) => setFormData(prev => ({...prev, location: e.target.value}))}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary"
+              >
+                <option value="">Select a location</option>
+                <option value="dubai">Dubai</option>
+                <option value="abu_dhabi">Abu Dhabi</option>
+                <option value="sharjah">Sharjah</option>
+              </select>
+            </div>
           </div>
           
           <div className="flex justify-end gap-4 mt-4">
