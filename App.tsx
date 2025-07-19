@@ -1,6 +1,7 @@
 
-import React, { useState, useMemo, createContext, useContext } from 'react';
+import React, { useState, useMemo, createContext, useContext, useEffect } from 'react';
 import { HashRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import Lenis from 'lenis';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -81,6 +82,17 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode; allowedRoles: User['
 
 function AppContent() {
   const { ToastComponent } = useToast();
+
+  useEffect(() => {
+    const lenis = new Lenis();
+
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+
+    requestAnimationFrame(raf);
+  }, []);
 
   return (
     <>

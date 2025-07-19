@@ -1,9 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../App';
+import { useToast } from '../context/ToastContext';
 import { UserIcon, LockClosedIcon, BellIcon } from '../components/shared/Icons';
 
 const SettingsPage: React.FC = () => {
   const { user } = useAuth();
+  const { showToast } = useToast();
+  const [settings, setSettings] = useState({
+    fullName: user?.username || '',
+    currentPassword: '',
+    newPassword: '',
+    emailNotifications: true,
+    smsNotifications: false,
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    setSettings(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
+  };
+
+  const handleSave = () => {
+    // In a real app, you'd send this to a server.
+    // For now, we'll just show a toast notification.
+    console.log('Saving settings:', settings);
+    showToast('Settings saved successfully!', 'success');
+  };
 
   return (
     <div className="container mx-auto">
@@ -20,11 +44,11 @@ const SettingsPage: React.FC = () => {
             <div className="space-y-4">
                 <div>
                     <label className="block text-sm font-medium text-text-secondary">Full Name</label>
-                    <input type="text" defaultValue={user?.username} className="mt-1 block w-full md:w-1/2 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary"/>
+                    <input type="text" name="fullName" value={settings.fullName} onChange={handleChange} className="mt-1 block w-full md:w-1/2 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary"/>
                 </div>
                  <div>
                     <label className="block text-sm font-medium text-text-secondary">Email Address</label>
-                    <input type="email" defaultValue={user?.email} className="mt-1 block w-full md:w-1/2 px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 cursor-not-allowed" readOnly/>
+                    <input type="email" value={user?.email} className="mt-1 block w-full md:w-1/2 px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 cursor-not-allowed" readOnly/>
                 </div>
             </div>
         </div>
@@ -38,11 +62,11 @@ const SettingsPage: React.FC = () => {
              <div className="space-y-4">
                 <div>
                     <label className="block text-sm font-medium text-text-secondary">Current Password</label>
-                    <input type="password" placeholder="••••••••" className="mt-1 block w-full md:w-1/2 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary"/>
+                    <input type="password" name="currentPassword" value={settings.currentPassword} onChange={handleChange} placeholder="••••••••" className="mt-1 block w-full md:w-1/2 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary"/>
                 </div>
                  <div>
                     <label className="block text-sm font-medium text-text-secondary">New Password</label>
-                    <input type="password" placeholder="••••••••" className="mt-1 block w-full md:w-1/2 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary"/>
+                    <input type="password" name="newPassword" value={settings.newPassword} onChange={handleChange} placeholder="••••••••" className="mt-1 block w-full md:w-1/2 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary"/>
                 </div>
             </div>
         </div>
@@ -57,14 +81,14 @@ const SettingsPage: React.FC = () => {
                 <div className="flex items-center justify-between">
                     <p className="text-text-secondary">Email notifications for status changes</p>
                     <label className="switch">
-                        <input type="checkbox" defaultChecked/>
+                        <input type="checkbox" name="emailNotifications" checked={settings.emailNotifications} onChange={handleChange}/>
                         <span className="slider round"></span>
                     </label>
                 </div>
                  <div className="flex items-center justify-between">
                     <p className="text-text-secondary">SMS notifications for appointments</p>
                     <label className="switch">
-                        <input type="checkbox"/>
+                        <input type="checkbox" name="smsNotifications" checked={settings.smsNotifications} onChange={handleChange}/>
                         <span className="slider round"></span>
                     </label>
                 </div>
@@ -72,7 +96,7 @@ const SettingsPage: React.FC = () => {
         </div>
         
         <div className="flex justify-end pt-6">
-            <button className="px-6 py-2 bg-primary text-on_primary font-semibold rounded-lg shadow-md hover:bg-opacity-90 transition-all">
+            <button onClick={handleSave} className="px-6 py-2 bg-primary text-on_primary font-semibold rounded-lg shadow-md hover:bg-opacity-90 transition-all">
                 Save Changes
             </button>
         </div>
