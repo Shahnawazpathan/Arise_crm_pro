@@ -14,3 +14,5 @@ This contains everything you need to run your app locally.
    `npm run dev`
 "# Arise_crm" 
 "# Arise_crm" 
+"# Arise_crm_pro" 
+"# Arise_crm_pro" 
