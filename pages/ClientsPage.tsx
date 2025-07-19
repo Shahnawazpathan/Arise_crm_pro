@@ -10,17 +10,27 @@ import { BookingStatus } from '../types';
 const ClientsPage: React.FC = () => {
   const { clients, loading, error } = useClients();
   const [searchTerm, setSearchTerm] = useState('');
+  const [locationFilter, setLocationFilter] = useState('');
   const navigate = useNavigate();
 
   const filteredClients = useMemo(() => {
-    if (!searchTerm) return clients;
-    return clients.filter(client =>
-      client.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      client.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      client.passportNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      client.email.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [clients, searchTerm]);
+    let filtered = clients;
+
+    if (searchTerm) {
+      filtered = filtered.filter(client =>
+        client.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        client.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        client.passportNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        client.email.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    if (locationFilter) {
+      filtered = filtered.filter(client => client.location === locationFilter);
+    }
+
+    return filtered;
+  }, [clients, searchTerm, locationFilter]);
   
   const handleExport = () => {
     const clientsToExport = clients.filter(c => c.appointment?.bookingStatus === BookingStatus.DATA_PREPARED);
@@ -77,7 +87,7 @@ const ClientsPage: React.FC = () => {
       </div>
 
       <div className="bg-white p-6 rounded-lg shadow-md">
-        <div className="mb-4">
+        <div className="flex gap-4 mb-4">
           <input
             type="text"
             placeholder="Search by name, passport, or email..."
@@ -85,6 +95,15 @@ const ClientsPage: React.FC = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-secondary"
           />
+          <select
+            onChange={(e) => setLocationFilter(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-secondary"
+          >
+            <option value="">All Locations</option>
+            <option value="dubai">Dubai</option>
+            <option value="abu_dhabi">Abu Dhabi</option>
+            <option value="sharjah">Sharjah</option>
+          </select>
         </div>
         {loading ? (
           <div className="flex flex-col items-center justify-center h-96">
