@@ -3,7 +3,7 @@ import React, { useState, useMemo } from 'react';
 import useApi from '../hooks/useApi';
 import ClientList from '../components/dashboard/ClientList';
 import { Spinner } from '../components/shared/Spinner';
-import { PlusIcon, DownloadIcon, AlertTriangleIcon } from '../components/shared/Icons';
+import { PlusIcon, DownloadIcon } from '../components/shared/Icons';
 import { useNavigate } from 'react-router-dom';
 import { BookingStatus, Client } from '../types';
 
