@@ -86,14 +86,22 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
         }
       });
 
+const bcrypt = require('bcrypt');
+
       db.run(`CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         email TEXT UNIQUE,
         password TEXT,
         role TEXT
-      )`, (err) => {
+      )`, async (err) => {
         if (err) {
           console.error('Users table creation error', err);
+        } else {
+          // Insert sample users data for employee and client login with hashed passwords
+          const insertUser = `INSERT OR IGNORE INTO users (email, password, role) VALUES (?, ?, ?)`;
+          const hashedPassword = await bcrypt.hash('password123', 10);
+          db.run(insertUser, ['employee1@example.com', hashedPassword, 'employee']);
+          db.run(insertUser, ['client1@example.com', hashedPassword, 'client']);
         }
       });
     });
