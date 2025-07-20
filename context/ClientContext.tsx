@@ -1,7 +1,7 @@
 
 import React, { createContext, useState, useContext, useEffect, useCallback, ReactNode } from 'react';
 import { Client, Appointment, MedicalResultStatus, PaymentStatus, BookingStatus } from '../types';
-import { getClients } from '../services/localDataService';
+import { fetchClients } from '../services/api';
 import { v4 as uuidv4 } from 'uuid';
 import { useNotifications } from './NotificationContext';
 
@@ -32,21 +32,15 @@ export const ClientProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const { addNotification } = useNotifications();
 
   useEffect(() => {
-    const fetchClients = async () => {
+    const fetchClientsData = async () => {
       try {
         setLoading(true);
         setError(null);
-        const cachedClients = sessionStorage.getItem('mockClients');
-        if (cachedClients) {
-            setClients(JSON.parse(cachedClients));
-        } else {
-            const clientData = await getClients();
-            if (clientData.length === 0) {
-              setError("Failed to fetch client data from the local data source.");
-            }
-            setClients(clientData);
-            sessionStorage.setItem('mockClients', JSON.stringify(clientData));
+        const clientData = await fetchClients();
+        if (clientData.length === 0) {
+          setError("Failed to fetch client data from the backend.");
         }
+        setClients(clientData);
       } catch (err) {
         setError('An error occurred while fetching client data.');
         console.error(err);
@@ -55,7 +49,7 @@ export const ClientProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       }
     };
 
-    fetchClients();
+    fetchClientsData();
   }, []);
 
   const addClient = useCallback((clientData: Omit<Client, 'id' | 'appointment'>) => {
@@ -79,7 +73,6 @@ export const ClientProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     };
     const updatedClients = [newClient, ...clients];
     setClients(updatedClients);
-    sessionStorage.setItem('mockClients', JSON.stringify(updatedClients));
     addNotification({ message: `New client "${newClient.firstName} ${newClient.lastName}" has been added.`, type: 'client' });
   }, [clients, addNotification]);
 
@@ -119,7 +112,6 @@ export const ClientProvider: React.FC<{ children: ReactNode }> = ({ children }) 
             }
             return client;
         });
-        sessionStorage.setItem('mockClients', JSON.stringify(updatedClients));
         return updatedClients;
     });
   }, [addNotification]);
@@ -163,7 +155,6 @@ export const ClientProvider: React.FC<{ children: ReactNode }> = ({ children }) 
             }
             return client;
         });
-        sessionStorage.setItem('mockClients', JSON.stringify(updatedClients));
         return updatedClients;
     });
     
