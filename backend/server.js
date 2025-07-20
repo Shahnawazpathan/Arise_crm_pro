@@ -40,6 +40,15 @@ app.post('/api/login', (req, res) => {
     return res.status(400).json({ error: 'Email and password are required' });
   }
 
+  // Add input validation
+  if (typeof email !== 'string' || !email.includes('@')) {
+    return res.status(400).json({ error: 'Invalid email format' });
+  }
+
+  if (typeof password !== 'string' || password.length < 6) {
+    return res.status(400).json({ error: 'Password must be at least 6 characters long' });
+  }
+
   const sql = 'SELECT * FROM users WHERE email = ?';
   db.get(sql, [email], async (err, user) => {
     if (err) {
@@ -72,13 +81,6 @@ app.get('/api/demands', (req, res) => {
       data: rows
     });
   });
-});
-
-// Serve frontend
-app.use(express.static(path.join(__dirname, '../dist')));
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
 
 // Endpoint to get all clients
@@ -174,10 +176,6 @@ app.get('/api/dashboard-stats', (req, res) => {
       });
     });
   });
-});
-
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
 });
 
 // Endpoint to get all appointments
