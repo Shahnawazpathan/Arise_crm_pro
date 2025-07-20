@@ -115,7 +115,7 @@ const ClientsPage: React.FC = () => {
           </div>
         ) : error ? (
           <div className="flex flex-col items-center justify-center h-96 bg-red-50 text-red-700 rounded-lg">
-            <AlertTriangleIcon className="h-12 w-12" />
+            <div className="h-12 w-12 text-red-600">!</div>
             <p className="mt-4 text-lg font-semibold">Error loading clients</p>
             <p className="text-sm">{error}</p>
             <button
