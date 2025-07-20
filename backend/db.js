@@ -85,6 +85,17 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
           db.run(insertAppointment, ['appt-1', 'c7a4c5a3-4a7c-4c4c-8a0a-4a2c7c7d7e3a', '2024-07-01', 'Health Center A', 'Paid', 'Booked', 'Fit', '2024-06-15']);
         }
       });
+
+      db.run(`CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        email TEXT UNIQUE,
+        password TEXT,
+        role TEXT
+      )`, (err) => {
+        if (err) {
+          console.error('Users table creation error', err);
+        }
+      });
     });
   }
 });
