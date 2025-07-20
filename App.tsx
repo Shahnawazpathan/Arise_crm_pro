@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo, createContext, useContext, useEffect } from 'react';
-import { HashRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Lenis from 'lenis';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
@@ -40,14 +40,17 @@ export const useAuth = () => {
   return context;
 };
 
+import authService from './services/authService';
+
 const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(authService.getCurrentUser()?.user);
 
   const login = (userData: User) => {
     setUser(userData);
   };
 
   const logout = () => {
+    authService.logout();
     setUser(null);
   };
 
@@ -97,7 +100,7 @@ function AppContent() {
   return (
     <>
       <ToastComponent />
-      <HashRouter>
+      <BrowserRouter>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
@@ -146,7 +149,7 @@ function AppContent() {
           </Route>
           
         </Routes>
-      </HashRouter>
+      </BrowserRouter>
     </>
   );
 }

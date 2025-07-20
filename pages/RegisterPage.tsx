@@ -4,6 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../App';
 import { AriseLogoIcon, GoogleIcon } from '../components/shared/Icons';
 import { useToast } from '../context/ToastContext';
+import authService from '../services/authService';
 
 const RegisterPage: React.FC = () => {
   const [role, setRole] = useState<'employee' | 'client'>('client');
@@ -21,7 +22,7 @@ const RegisterPage: React.FC = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     // Basic validation
@@ -30,19 +31,20 @@ const RegisterPage: React.FC = () => {
         return;
     }
 
-    showToast(`Registration successful for ${formData.name}!`, 'success');
-    
-    // Simulate login after successful registration
-    setTimeout(() => {
-      if (role === 'employee') {
-          auth.login({ id: 'new-user-1', username: formData.name, email: formData.email, role: 'employee' });
-          navigate('/dashboard');
+    try {
+      await authService.register({ ...formData, role });
+      showToast(`Registration successful for ${formData.name}!`, 'success');
+      // Log in the user after registration
+      const data = await authService.login({ email: formData.email, password: formData.password });
+      auth.login(data.user);
+      if (data.user.role === 'employee') {
+        navigate('/dashboard');
       } else {
-          // In a real app, this would create a new client and link the ID
-           auth.login({ id: 'new-user-2', username: formData.name, email: formData.email, role: 'client', clientId: 'c7a4c5a3-4a7c-4c4c-8a0a-4a2c7c7d7e3a' });
-          navigate('/client-dashboard');
+        navigate('/client-dashboard');
       }
-    }, 1000);
+    } catch (error: any) {
+      setError(error.response?.data?.error || 'Registration failed');
+    }
   };
 
   const handleGoogleRegister = () => {

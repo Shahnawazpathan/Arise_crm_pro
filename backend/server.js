@@ -1,12 +1,63 @@
 const express = require('express');
 const db = require('./db');
 const cors = require('cors');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const path = require('path');
 
 const app = express();
 const PORT = 3001;
+const JWT_SECRET = 'your_jwt_secret'; // In a real app, use an environment variable
 
 app.use(cors());
 app.use(express.json());
+
+// Register endpoint
+app.post('/api/register', async (req, res) => {
+  const { email, password, role } = req.body;
+  if (!email || !password || !role) {
+    return res.status(400).json({ error: 'Email, password, and role are required' });
+  }
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const sql = 'INSERT INTO users (email, password, role) VALUES (?, ?, ?)';
+    db.run(sql, [email, hashedPassword, role], function (err) {
+      if (err) {
+        return res.status(500).json({ error: 'Email already exists' });
+      }
+      res.status(201).json({ message: 'User registered successfully', userId: this.lastID });
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Login endpoint
+app.post('/api/login', (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password are required' });
+  }
+
+  const sql = 'SELECT * FROM users WHERE email = ?';
+  db.get(sql, [email], async (err, user) => {
+    if (err) {
+      return res.status(500).json({ error: 'Server error' });
+    }
+    if (!user) {
+      return res.status(400).json({ error: 'Invalid credentials' });
+    }
+
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect) {
+      return res.status(400).json({ error: 'Invalid credentials' });
+    }
+
+    const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
+    res.json({ message: 'Login successful', token, user: { id: user.id, email: user.email, role: user.role } });
+  });
+});
 
 // Endpoint to get all demands
 app.get('/api/demands', (req, res) => {
@@ -21,6 +72,13 @@ app.get('/api/demands', (req, res) => {
       data: rows
     });
   });
+});
+
+// Serve frontend
+app.use(express.static(path.join(__dirname, '../dist')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
 
 // Endpoint to get all clients
