@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../App';
 import { AriseLogoIcon, GoogleIcon } from '../components/shared/Icons';
@@ -14,9 +14,22 @@ const RegisterPage: React.FC = () => {
     password: '',
   });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [fadeIn, setFadeIn] = useState(false);
   const navigate = useNavigate();
   const auth = useAuth();
   const { showToast } = useToast();
+
+  useEffect(() => {
+    setFadeIn(true);
+  }, []);
+
+  const handleNavigate = (path: string) => {
+    setFadeIn(false);
+    setTimeout(() => {
+      navigate(path);
+    }, 300);
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -31,6 +44,7 @@ const RegisterPage: React.FC = () => {
         return;
     }
 
+    setLoading(true);
     try {
       await authService.register({ ...formData, role });
       showToast(`Registration successful for ${formData.name}!`, 'success');
@@ -38,12 +52,14 @@ const RegisterPage: React.FC = () => {
       const data = await authService.login({ email: formData.email, password: formData.password });
       auth.login(data.user);
       if (data.user.role === 'employee') {
-        navigate('/dashboard');
+        handleNavigate('/dashboard');
       } else {
-        navigate('/client-dashboard');
+        handleNavigate('/client-dashboard');
       }
     } catch (error: any) {
       setError(error.response?.data?.error || 'Registration failed');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -51,12 +67,12 @@ const RegisterPage: React.FC = () => {
     showToast('Simulating Google Sign-Up...', 'info');
     setTimeout(() => {
         auth.login({ id: 'google-user-1', username: 'Google User', email: 'google@example.com', role, clientId: role === 'client' ? 'c7a4c5a3-4a7c-4c4c-8a0a-4a2c7c7d7e3a' : undefined });
-        navigate(role === 'employee' ? '/dashboard' : '/client-dashboard');
+        handleNavigate(role === 'employee' ? '/dashboard' : '/client-dashboard');
     }, 1000);
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+    <div className={`min-h-screen flex items-center justify-center bg-background p-4 transition-opacity duration-300 ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
       <div className="w-full max-w-md bg-surface rounded-2xl shadow-xl p-8 space-y-6">
         <div className="text-center">
           <AriseLogoIcon className="h-16 w-16 mx-auto" />
@@ -109,8 +125,9 @@ const RegisterPage: React.FC = () => {
 
           <div>
             <button type="submit"
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-on_primary bg-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-transform transform hover:scale-105">
-              Create Account
+              disabled={loading}
+              className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-on_primary bg-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-transform transform hover:scale-105 ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}>
+              {loading ? 'Creating Account...' : 'Create Account'}
             </button>
           </div>
         </form>

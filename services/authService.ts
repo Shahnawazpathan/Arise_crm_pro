@@ -1,35 +1,51 @@
-import axios from 'axios';
-import { User } from '../types';
+const API_BASE_URL = "http://localhost:3001/api";
 
-const API_URL = 'http://localhost:3001/api';
-
-const register = (data: Omit<User, 'id'>) => {
-  return axios.post(`${API_URL}/register`, data);
-};
-
-const login = async (data: Omit<User, 'id' | 'role'>) => {
-  const response = await axios.post(`${API_URL}/login`, data);
-  if (response.data.token) {
-    localStorage.setItem('user', JSON.stringify(response.data));
+async function register(userData: { name: string; email: string; password: string; role: string }) {
+  const response = await fetch(`${API_BASE_URL}/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(userData),
+  });
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Registration failed");
   }
-  return response.data;
-};
+  return await response.json();
+}
 
-const logout = () => {
-  localStorage.removeItem('user');
-};
+async function login(credentials: { email: string; password: string }) {
+  const response = await fetch(`${API_BASE_URL}/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(credentials),
+  });
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Login failed");
+  }
+  const data = await response.json();
+  // Save user data to localStorage for session persistence
+  localStorage.setItem('user', JSON.stringify(data.user));
+  return data;
+}
 
-const getCurrentUser = () => {
+function getCurrentUser() {
   const userStr = localStorage.getItem('user');
-  if (userStr) {
-    return JSON.parse(userStr);
+  if (!userStr) return null;
+  try {
+    return { user: JSON.parse(userStr) };
+  } catch {
+    return null;
   }
-  return null;
-};
+}
+
+function logout() {
+  localStorage.removeItem('user');
+}
 
 export default {
   register,
   login,
-  logout,
   getCurrentUser,
+  logout,
 };

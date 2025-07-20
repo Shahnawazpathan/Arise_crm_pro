@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../App';
 import { AriseLogoIcon, GoogleIcon } from '../components/shared/Icons';
@@ -11,9 +10,22 @@ const LoginPage: React.FC = () => {
   const [email, setEmail] = useState(loginType === 'employee' ? 'employee@arise.com' : 'client@example.com');
   const [password, setPassword] = useState('password123');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [fadeIn, setFadeIn] = useState(false);
   const navigate = useNavigate();
   const auth = useAuth();
   const { showToast } = useToast();
+
+  useEffect(() => {
+    setFadeIn(true);
+  }, []);
+
+  const handleNavigate = (path: string) => {
+    setFadeIn(false);
+    setTimeout(() => {
+      navigate(path);
+    }, 300);
+  };
 
   const handleLoginTypeChange = (type: 'employee' | 'client') => {
     setLoginType(type);
@@ -25,16 +37,19 @@ const LoginPage: React.FC = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
     try {
       const data = await authService.login({ email, password });
       auth.login(data.user);
       if (data.user.role === 'employee') {
-        navigate('/dashboard');
+        handleNavigate('/dashboard');
       } else {
-        navigate('/client-dashboard');
+        handleNavigate('/client-dashboard');
       }
     } catch (error: any) {
       setError(error.response?.data?.error || 'Login failed');
+    } finally {
+      setLoading(false);
     }
   };
   
@@ -43,7 +58,7 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+    <div className={`min-h-screen flex items-center justify-center bg-background p-4 transition-opacity duration-300 ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
       <div className="w-full max-w-md bg-surface rounded-2xl shadow-xl p-8 space-y-6">
         <div className="text-center">
           <AriseLogoIcon className="h-16 w-16 mx-auto" />
@@ -106,9 +121,10 @@ const LoginPage: React.FC = () => {
           <div>
             <button
               type="submit"
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-on_primary bg-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-transform transform hover:scale-105"
+              disabled={loading}
+              className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-on_primary bg-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-transform transform hover:scale-105 ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
             >
-              Sign In
+              {loading ? 'Signing In...' : 'Sign In'}
             </button>
           </div>
         </form>

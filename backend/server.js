@@ -12,6 +12,10 @@ const JWT_SECRET = 'your_jwt_secret'; // In a real app, use an environment varia
 app.use(cors());
 app.use(express.json());
 
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+
 // Register endpoint
 app.post('/api/register', async (req, res) => {
   const { email, password, role } = req.body;
