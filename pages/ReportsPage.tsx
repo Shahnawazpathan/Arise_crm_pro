@@ -1,38 +1,39 @@
 
-import React, { useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { useClients } from '../context/ClientContext';
 import { Spinner } from '../components/shared/Spinner';
-import { MedicalResultStatus } from '../types';
 
 const COLORS = ['#073B4C', '#118AB2', '#06D6A0', '#FFD166', '#EF476F', '#7b2cbf'];
 
+interface ReportData {
+  nationalityCounts: { name: string; count: number }[];
+  statusCounts: { status: string; count: number }[];
+}
+
 const ReportsPage: React.FC = () => {
-  const { clients, loading, error } = useClients();
+  const [reportData, setReportData] = useState<ReportData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const nationalityData = useMemo(() => {
-    if (!clients.length) return [];
-    const counts = clients.reduce((acc, client) => {
-      acc[client.nationality] = (acc[client.nationality] || 0) + 1;
-      return acc;
-    }, {} as { [key: string]: number });
-    return Object.entries(counts).map(([name, value]) => ({ name, value }));
-  }, [clients]);
-  
-  const statusData = useMemo(() => {
-    if(!clients.length) return [];
-    
-    const statusCounts = clients.reduce((acc, client) => {
-        const status = client.appointment?.medicalResultStatus || MedicalResultStatus.N_A;
-        acc[status] = (acc[status] || 0) + 1;
-        return acc;
-    }, {} as Record<MedicalResultStatus, number>);
-
-    return Object.entries(statusCounts)
-        .map(([name, count]) => ({name, count}))
-        .filter(item => item.count > 0);
-
-  }, [clients]);
+  useEffect(() => {
+    async function loadReportData() {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await fetch('http://localhost:3001/api/reports');
+        if (!response.ok) {
+          throw new Error('Failed to fetch report data');
+        }
+        const json = await response.json();
+        setReportData(json.data);
+      } catch (err) {
+        setError((err as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadReportData();
+  }, []);
 
   if (loading) {
     return <div className="flex justify-center items-center h-64"><Spinner /></div>;
@@ -53,7 +54,7 @@ const ReportsPage: React.FC = () => {
           <div style={{ width: '100%', height: 350 }}>
             <ResponsiveContainer>
               <PieChart>
-                <Pie data={nationalityData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={120} fill="#8884d8" labelLine={false} label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+                <Pie data={reportData?.nationalityCounts} dataKey="count" nameKey="name" cx="50%" cy="50%" outerRadius={120} fill="#8884d8" labelLine={false} label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
                     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
                     const x = cx + radius * Math.cos(-midAngle * (Math.PI / 180));
                     const y = cy + radius * Math.sin(-midAngle * (Math.PI / 180));
@@ -63,7 +64,7 @@ const ReportsPage: React.FC = () => {
                         </text> : null
                     );
                 }}>
-                  {nationalityData.map((entry, index) => (
+                  {reportData?.nationalityCounts.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
@@ -79,10 +80,10 @@ const ReportsPage: React.FC = () => {
            <h2 className="text-xl font-semibold text-text-primary mb-4">Appointment Status Breakdown</h2>
            <div style={{ width: '100%', height: 350 }}>
                 <ResponsiveContainer>
-                    <BarChart data={statusData} layout="vertical" margin={{ top: 5, right: 30, left: 50, bottom: 5 }}>
+                    <BarChart data={reportData?.statusCounts} layout="vertical" margin={{ top: 5, right: 30, left: 50, bottom: 5 }}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis type="number" />
-                        <YAxis dataKey="name" type="category" width={120} tick={{ fontSize: 12 }}/>
+                        <YAxis dataKey="status" type="category" width={120} tick={{ fontSize: 12 }}/>
                         <Tooltip wrapperClassName="!bg-surface !border-gray-200 !rounded-md !shadow-lg" />
                         <Bar dataKey="count" name="Total" fill="#118AB2" barSize={20} />
                     </BarChart>
@@ -95,3 +96,4 @@ const ReportsPage: React.FC = () => {
 };
 
 export default ReportsPage;
+

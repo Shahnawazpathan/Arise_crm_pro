@@ -8,7 +8,7 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isSidebarOpen }) => {
-  const navLinkClasses = "flex items-center p-3 my-1 text-gray-300 rounded-lg hover:bg-secondary/80 hover:text-white transition-colors duration-200";
+  const navLinkClasses = "flex items-center p-3 my-1 text-gray-300 rounded-lg hover:bg-secondary/80 hover:text-white transition-all duration-200 transform hover:translate-x-2";
   const activeLinkClasses = "bg-accent text-primary font-bold";
 
   return (

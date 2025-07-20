@@ -68,7 +68,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, isSidebarOpen }) => {
           </button>
           {dropdownOpen && (
             <div 
-              className="absolute right-0 mt-2 w-48 bg-surface rounded-md shadow-xl z-30 overflow-hidden"
+              className="absolute right-0 mt-2 w-48 bg-surface rounded-md shadow-xl z-30 overflow-hidden animate-fade-in-down"
               onMouseLeave={() => setDropdownOpen(false)}
             >
               <a href="#/dashboard/settings" className="block px-4 py-2 text-sm text-text-primary hover:bg-background">My Profile</a>
@@ -91,6 +91,19 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, isSidebarOpen }) => {
         }
         .animate-shake {
           animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes fade-in-down {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fade-in-down {
+          animation: fade-in-down 0.3s ease-out forwards;
         }
       `}</style>
     </header>

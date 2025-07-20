@@ -51,6 +51,7 @@ export interface Client {
   email: string;
   profilePicture?: string; // Optional Base64 encoded string for image
   appointment?: Appointment;
+  location?: string;
 }
 
 export interface AppointmentHistory {

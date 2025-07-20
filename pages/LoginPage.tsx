@@ -4,6 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../App';
 import { AriseLogoIcon, GoogleIcon } from '../components/shared/Icons';
 import { useToast } from '../context/ToastContext';
+import authService from '../services/authService';
 
 const LoginPage: React.FC = () => {
   const [loginType, setLoginType] = useState<'employee' | 'client'>('employee');
@@ -21,39 +22,25 @@ const LoginPage: React.FC = () => {
     setError('');
   }
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    let userLoggedIn = false;
-
-    if (loginType === 'employee' && email === 'employee@arise.com' && password === 'password123') {
-      auth.login({ id: '1', username: 'Mohd. Ibraheem', email: email, role: 'employee' });
-      navigate('/dashboard');
-      userLoggedIn = true;
-    } else if (loginType === 'client' && email === 'client@example.com' && password === 'password123') {
-      auth.login({ id: '2', username: 'Farhan Ahmed', email: email, role: 'client', clientId: 'c7a4c5a3-4a7c-4c4c-8a0a-4a2c7c7d7e3a' });
-      navigate('/client-dashboard');
-      userLoggedIn = true;
-    }
-
-    if (!userLoggedIn) {
-      setError('Invalid credentials. Please try again.');
+    try {
+      const data = await authService.login({ email, password });
+      auth.login(data.user);
+      if (data.user.role === 'employee') {
+        navigate('/dashboard');
+      } else {
+        navigate('/client-dashboard');
+      }
+    } catch (error: any) {
+      setError(error.response?.data?.error || 'Login failed');
     }
   };
   
-  const handleGoogleLogin = () => {
-      showToast('Simulating Google Sign-In...', 'info');
-      // Simulate successful login after a short delay
-      setTimeout(() => {
-        if (loginType === 'employee') {
-            auth.login({ id: '1', username: 'Mohd. Ibraheem', email: 'employee@arise.com', role: 'employee' });
-            navigate('/dashboard');
-        } else {
-             auth.login({ id: '2', username: 'Farhan Ahmed', email: 'client@example.com', role: 'client', clientId: 'c7a4c5a3-4a7c-4c4c-8a0a-4a2c7c7d7e3a' });
-            navigate('/client-dashboard');
-        }
-      }, 1000);
-  }
+  const handleGoogleLogin = async () => {
+    showToast('This feature is not yet implemented.', 'info');
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">

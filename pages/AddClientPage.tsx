@@ -22,7 +22,7 @@ const AddClientPage: React.FC = () => {
   const [profilePicture, setProfilePicture] = useState<string | undefined>(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -48,7 +48,7 @@ const AddClientPage: React.FC = () => {
         return;
     }
 
-    const clientData = { ...formData, profilePicture };
+    const clientData = { ...formData, profilePicture, location: formData.location };
     addClient(clientData as Omit<Client, 'id' | 'appointment'>);
 
     showToast('Client added successfully!', 'success');
@@ -75,7 +75,7 @@ const AddClientPage: React.FC = () => {
                  <label htmlFor="file-upload" className="block text-sm font-medium text-gray-700">
                     Client Photo
                 </label>
-                <div className="mt-1 flex items-center justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                <div className="mt-1 flex items-center justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md transition-colors duration-300 hover:border-primary">
                     <div className="space-y-1 text-center">
                         <FileUploadIcon className="mx-auto h-12 w-12 text-gray-400" />
                         <div className="flex text-sm text-gray-600">
@@ -113,20 +113,36 @@ const AddClientPage: React.FC = () => {
                   </div>
                 );
               })}
+            <div>
+              <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
+                Location
+              </label>
+              <select
+                id="location"
+                name="location"
+                onChange={(e) => setFormData(prev => ({...prev, location: e.target.value}))}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary"
+              >
+                <option value="">Select a location</option>
+                <option value="dubai">Dubai</option>
+                <option value="abu_dhabi">Abu Dhabi</option>
+                <option value="sharjah">Sharjah</option>
+              </select>
+            </div>
           </div>
           
           <div className="flex justify-end gap-4 mt-4">
             <button
               type="button"
               onClick={() => navigate('/dashboard/clients')}
-              className="px-6 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-all"
+              className="px-6 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-all transform hover:-translate-y-1"
               disabled={isSubmitting}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-6 py-2 bg-primary text-on_primary font-semibold rounded-lg shadow-md hover:bg-opacity-90 transition-all disabled:bg-gray-400"
+              className="px-6 py-2 bg-primary text-on_primary font-semibold rounded-lg shadow-md hover:bg-opacity-90 transition-all transform hover:-translate-y-1 disabled:bg-gray-400"
               disabled={isSubmitting}
             >
               {isSubmitting ? 'Submitting...' : 'Add Client'}
